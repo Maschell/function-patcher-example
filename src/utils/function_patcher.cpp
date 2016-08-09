@@ -195,6 +195,27 @@ int isDynamicFunction(unsigned int physicalAddress){
 unsigned int GetAddressOfFunction(const char * functionName,unsigned int library){
     unsigned int real_addr = 0;
 
+    if(strcmp(functionName, "OSDynLoad_Acquire") == 0)
+    {
+        memcpy(&real_addr, &OSDynLoad_Acquire, 4);
+        return real_addr;
+    }
+    else if(strcmp(functionName, "LiWaitOneChunk") == 0)
+    {
+        real_addr = (unsigned int)addr_LiWaitOneChunk;
+        return real_addr;
+    }
+    else if(strcmp(functionName, "LiBounceOneChunk") == 0)
+    {
+        //! not required on firmwares above 3.1.0
+        if(OS_FIRMWARE >= 400)
+            return 0;
+
+        unsigned int addr_LiBounceOneChunk = 0x010003A0;
+        real_addr = (unsigned int)addr_LiBounceOneChunk;
+        return real_addr;
+    }
+
     unsigned int rpl_handle = 0;
     if(library == LIB_CORE_INIT){
         if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_CORE_INIT\n", functionName);
@@ -279,9 +300,14 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
         return 0;
     }
 
-    if((u32)(*(volatile unsigned int*)(real_addr) & 0xFF000000) == 0x48000000){
-        real_addr += (u32)(*(volatile unsigned int*)(real_addr) & 0x0000FFFF);
-        if((u32)(*(volatile unsigned int*)(real_addr) & 0xFF000000) == 0x48000000){
+    if((u32)(*(volatile unsigned int*)(real_addr) & 0x48000002) == 0x48000000)
+    {
+        unsigned int address_diff = (u32)(*(volatile unsigned int*)(real_addr) & 0x03FFFFFC);
+        if((address_diff & 0x03000000) == 0x03000000) {
+            address_diff |=  0xFC000000;
+        }
+        real_addr += (int)address_diff;
+        if((u32)(*(volatile unsigned int*)(real_addr) & 0x48000002) == 0x48000000){
             return 0;
         }
     }
