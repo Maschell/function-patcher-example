@@ -11,8 +11,6 @@
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/socket_functions.h"
 #include "dynamic_libs/sys_functions.h"
-#include "patcher/coreinit_function_patcher.h"
-#include "patcher/fs_function_patcher.h"
 #include "patcher/pad_function_patcher.h"
 #include "utils/function_patcher.h"
 #include "kernel/kernel_functions.h"
@@ -33,7 +31,6 @@ extern "C" int Menu_Main(void)
 
     //For patching
     InitVPadFunctionPointers();
-    InitPadScoreFunctionPointers();
 
     SetupKernelCallback();
 
@@ -72,8 +69,6 @@ extern "C" int Menu_Main(void)
     Patching all the functions!!!
 */
 void ApplyPatches(){
-    PatchInvidualMethodHooks(method_hooks_coreinit,     method_hooks_size_coreinit,     method_calls_coreinit);
-    PatchInvidualMethodHooks(method_hooks_fs,           method_hooks_size_fs,           method_calls_fs);
     PatchInvidualMethodHooks(method_hooks_pad,          method_hooks_size_pad,          method_calls_pad);
 }
 
@@ -81,8 +76,6 @@ void ApplyPatches(){
     Restoring everything!!
 */
 void deInit(){
-    RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
-    RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
     RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
     log_deinit();
 }

@@ -1,4 +1,4 @@
-OUTPUT(functionpatcherexample.elf);
+OUTPUT(padcon.elf);
 
 /* Tell linker where our application entry is so the garbage collect can work correct */
 ENTRY(__entry_menu);
