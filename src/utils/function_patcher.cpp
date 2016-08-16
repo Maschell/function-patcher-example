@@ -1,5 +1,6 @@
 /****************************************************************************
  * Copyright (C) 2016 Maschell
+ * With code from chadderz and dimok
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,7 +103,7 @@ void PatchInvidualMethodHooks(hooks_magic_t method_hooks[],int hook_information_
             log_printf("Error. Can't save %s for restoring!\n", method_hooks[i].functionName);
         }
 
-        //adding jump to real function
+        //adding jump to real function thx @ dimok for the assembler code
         /*
             90 61 ff e0     stw     r3,-32(r1)
             3c 60 12 34     lis     r3,4660
@@ -148,6 +149,7 @@ void RestoreInvidualInstructions(hooks_magic_t method_hooks[],int hook_informati
     int method_hooks_count = hook_information_size;
     for(int i = 0; i < method_hooks_count; i++)
     {
+        log_printf("Restoring %s... ",method_hooks[i].functionName);
         if(method_hooks[i].restoreInstruction == 0 || method_hooks[i].realAddr == 0){
             log_printf("I dont have the information for the restore =( skip\n");
             continue;
@@ -168,7 +170,7 @@ void RestoreInvidualInstructions(hooks_magic_t method_hooks[],int hook_informati
 
         if(isDynamicFunction(physical))
         {
-             log_printf("Its a dynamic function. We don't need to restore it! %s\n",method_hooks[i].functionName);
+             log_printf("Its a dynamic function. We don't need to restore it!\n",method_hooks[i].functionName);
         }
         else
         {
@@ -177,6 +179,7 @@ void RestoreInvidualInstructions(hooks_magic_t method_hooks[],int hook_informati
             SC0x25_KernelCopyData(physical,(u32)&method_hooks[i].restoreInstruction , 4);
             if(DEBUG_LOG_DYN)log_printf("ICInvalidateRange %08X\n",(void*)method_hooks[i].realAddr);
             ICInvalidateRange((void*)method_hooks[i].realAddr, 4);
+            log_printf("done\n");
         }
         method_hooks[i].alreadyPatched = 0; // In case a
     }
@@ -311,6 +314,9 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
             return 0;
         }
     }
+
+
+
 
     return real_addr;
 }
