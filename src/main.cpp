@@ -18,6 +18,8 @@
 #include "kernel/kernel_functions.h"
 #include "utils/logger.h"
 
+u8 isFirstBoot __attribute__((section(".data"))) = 1;
+
 /* Entry point */
 extern "C" int Menu_Main(void)
 {
@@ -40,8 +42,9 @@ extern "C" int Menu_Main(void)
     log_init("192.168.0.181");
 
     //Reset everything when were going back to the Mii Maker
-    if(strlen(cosAppXmlInfoStruct.rpx_name) > 0 && strcasecmp("ffl_app.rpx", cosAppXmlInfoStruct.rpx_name) == 0){
+    if(!isFirstBoot && isInMiiMakerHBL()){
         log_print("Returing to the Homebrew Launcher!\n");
+        isFirstBoot = 0;
         deInit();
         return EXIT_SUCCESS;
     }
@@ -54,12 +57,12 @@ extern "C" int Menu_Main(void)
     ApplyPatches();
 
 
-    if(strlen(cosAppXmlInfoStruct.rpx_name) > 0 && strcasecmp("ffl_app.rpx", cosAppXmlInfoStruct.rpx_name) != 0) //Starting the application
-    {
+    if(!isInMiiMakerHBL()){ //Starting the application
         return EXIT_RELAUNCH_ON_LOAD;
     }
 
-    if(strlen(cosAppXmlInfoStruct.rpx_name) <= 0){ // First boot back to SysMenu
+    if(isFirstBoot){ // First boot back to SysMenu
+        isFirstBoot = 0;
         SYSLaunchMenu();
         return EXIT_RELAUNCH_ON_LOAD;
     }
@@ -80,9 +83,27 @@ void ApplyPatches(){
 /*
     Restoring everything!!
 */
-void deInit(){
+
+void RestorePatches(){
     RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
     RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
     RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
+    KernelRestoreInstructions();
+}
+
+void deInit(){
+    RestorePatches();
     log_deinit();
+}
+
+s32 isInMiiMakerHBL(){
+    if (OSGetTitleID != 0 && (
+            OSGetTitleID() == 0x000500101004A200 || // mii maker eur
+            OSGetTitleID() == 0x000500101004A100 || // mii maker usa
+            OSGetTitleID() == 0x000500101004A000 ||// mii maker jpn
+            OSGetTitleID() == 0x0005000013374842))
+        {
+            return 1;
+    }
+    return 0;
 }

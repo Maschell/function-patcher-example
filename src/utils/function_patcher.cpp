@@ -184,7 +184,6 @@ void RestoreInvidualInstructions(hooks_magic_t method_hooks[],int hook_informati
         method_hooks[i].alreadyPatched = 0; // In case a
     }
 
-    KernelRestoreInstructions();
     log_print("Done with restoring given functions!\n");
 }
 
