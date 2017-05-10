@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#ifndef _FS_FUNCTION_PATCHER_H
-#define _FS_FUNCTION_PATCHER_H
+#ifndef _CORE_INIT_FUNCTION_PATCHER_H
+#define _CORE_INIT_FUNCTION_PATCHER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,12 +24,12 @@ extern "C" {
 
 #include "utils/function_patcher.h"
 
-extern hooks_magic_t method_hooks_fs[];
-extern u32 method_hooks_size_fs;
-extern volatile unsigned int method_calls_fs[];
+extern hooks_magic_t method_hooks_core_init[];
+extern u32 method_hooks_size_core_init;
+extern volatile u32 method_calls_core_init[];
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* _FS_FUNCTION_PATCHER_H */
+#endif /* _CORE_INIT_FUNCTION_PATCHER_H */

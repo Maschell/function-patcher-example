@@ -11,14 +11,16 @@
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/socket_functions.h"
 #include "dynamic_libs/sys_functions.h"
-#include "patcher/coreinit_function_patcher.h"
-#include "patcher/fs_function_patcher.h"
-#include "patcher/pad_function_patcher.h"
-#include "utils/function_patcher.h"
 #include "kernel/kernel_functions.h"
+#include "patcher/core_init_function_patcher.hpp"
+#include "utils/function_patcher.h"
 #include "utils/logger.h"
+#include "system/CThread.h"
 
-u8 isFirstBoot __attribute__((section(".data"))) = 1;
+volatile u8 gEndThread __attribute__((section(".data"))) = 0;
+volatile u8 isFirstBoot __attribute__((section(".data"))) = 1;
+//Forward declaration
+void mainThread(CThread *thread, void *arg);
 
 /* Entry point */
 extern "C" int Menu_Main(void)
@@ -33,9 +35,7 @@ extern "C" int Menu_Main(void)
 
     InitSysFunctionPointers(); // For SYSLaunchMenu()
 
-    //For patching
-    InitVPadFunctionPointers();
-    InitPadScoreFunctionPointers();
+    gEndThread = 0;
 
     SetupKernelCallback();
 
@@ -49,13 +49,11 @@ extern "C" int Menu_Main(void)
         return EXIT_SUCCESS;
     }
 
-
-    //!*******************************************************************
-    //!                        Patching functions                        *
-    //!*******************************************************************
-    log_print("Patching functions\n");
     ApplyPatches();
 
+    //Start Thread!
+    CThread * pThread = CThread::create(mainThread, NULL, CThread::eAttributeAffCore2 | CThread::eAttributePinnedAff, 15);
+    pThread->resumeThread();
 
     if(!isInMiiMakerHBL()){ //Starting the application
         return EXIT_RELAUNCH_ON_LOAD;
@@ -71,25 +69,23 @@ extern "C" int Menu_Main(void)
     return EXIT_SUCCESS;
 }
 
-/*
-    Patching all the functions!!!
-*/
-void ApplyPatches(){
-    PatchInvidualMethodHooks(method_hooks_coreinit,     method_hooks_size_coreinit,     method_calls_coreinit);
-    PatchInvidualMethodHooks(method_hooks_fs,           method_hooks_size_fs,           method_calls_fs);
-    PatchInvidualMethodHooks(method_hooks_pad,          method_hooks_size_pad,          method_calls_pad);
+
+void mainThread(CThread *thread, void *arg){
+    while(!gEndThread){
+        log_printf("Thread running..\n");
+        os_usleep(1000*1000); //Wait for 1 second.
+    }
+    log_printf("Thread ended\n");
 }
 
-/*
-    Restoring everything!!
-*/
+void ApplyPatches(){
+    PatchInvidualMethodHooks(   method_hooks_core_init,    method_hooks_size_core_init,   method_calls_core_init);
+}
 
 void RestorePatches(){
-    RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
-    RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
-    RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
-    KernelRestoreInstructions();
+    RestoreInvidualInstructions(method_hooks_core_init,    method_hooks_size_core_init);
 }
+
 
 void deInit(){
     RestorePatches();
