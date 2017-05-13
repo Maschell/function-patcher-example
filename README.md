@@ -1,6 +1,6 @@
-#logging hooks#
+# logging hooks
 
-hooks into all kind of logging methods and log them via the UDP logger.
+hooks into all kind of logging methods and log them via the UDP logger.  
 Caution: Before you start or end an application, press the right stick to disable the logging until a new app it started. Otherwise the console will softlock
 
 #Building#

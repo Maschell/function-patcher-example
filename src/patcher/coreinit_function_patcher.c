@@ -42,8 +42,7 @@ DECL(void, __PPCExit, void){
 DECL(void, COSVReport, uint32_t module, int level, const char *fmt, va_list *va){
     if(shouldLog == 0)return;
     char * tmp = NULL;
-    if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+    if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
         log_printf("COSVReport module %d level %d: %s",module,level,tmp);
 	}
 	if(tmp)
@@ -72,8 +71,7 @@ DECL(void, COSError, uint32_t module, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
         log_printf("COSError module %d: %s",module,tmp);
 	}
 	va_end(va);
@@ -89,8 +87,7 @@ DECL(void, COSWarn, uint32_t module, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
         log_printf("COSWarn module %d: %s",module,tmp);
 	}
 	va_end(va);
@@ -106,8 +103,7 @@ DECL(void, COSInfo, uint32_t module, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("COSInfo module %d: %s",module,tmp);
 	}
 	va_end(va);
@@ -123,8 +119,7 @@ DECL(void, COSVerbose, uint32_t module, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("COSVerbose module %d: %s",module,tmp);
 	}
 	va_end(va);
@@ -140,8 +135,7 @@ DECL(void, OSReport, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("OSReport: %s",tmp);
 	}
 	va_end(va);
@@ -156,8 +150,7 @@ DECL(void, OSReportWarn, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("OSReportWarn: %s",tmp);
 	}
 	va_end(va);
@@ -173,8 +166,7 @@ DECL(void, OSReportInfo, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("OSReportInfo: %s",tmp);
 	}
 	va_end(va);
@@ -190,8 +182,7 @@ DECL(void, OSReportVerbose, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("OSReportVerbose: %s",tmp);
 	}
 	va_end(va);
@@ -206,8 +197,7 @@ DECL(void, OSPanic, const char *file, int line, const char *fmt, ...){
 
 	va_list va;
 	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)
-	{
+	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
         log_printf("OSPanic [%s line: %d]: %s",file,line,tmp);
 	}
 	va_end(va);
@@ -225,8 +215,8 @@ DECL(void, OSConsoleWrite, const char *msg, uint32_t size){
 }
 
 hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
-    MAKE_MAGIC(COSVReport,                              LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSLogPrintf,                              LIB_CORE_INIT,  STATIC_FUNCTION),
+    MAKE_MAGIC(COSVReport,                            LIB_CORE_INIT,  STATIC_FUNCTION),
+    MAKE_MAGIC(OSLogPrintf,                           LIB_CORE_INIT,  STATIC_FUNCTION),
     MAKE_MAGIC(OSReport,                              LIB_CORE_INIT,  STATIC_FUNCTION),
     MAKE_MAGIC(COSError,                              LIB_CORE_INIT,  STATIC_FUNCTION),
     MAKE_MAGIC(COSWarn,                               LIB_CORE_INIT,  STATIC_FUNCTION),
