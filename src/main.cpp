@@ -17,12 +17,15 @@
 #include "utils/function_patcher.h"
 #include "kernel/kernel_functions.h"
 #include "utils/logger.h"
+#include "utils/logger.h"
+#include "common/retain_vars.h"
 
 u8 isFirstBoot __attribute__((section(".data"))) = 1;
 
 /* Entry point */
 extern "C" int Menu_Main(void)
 {
+
     //!*******************************************************************
     //!                   Initialize function pointers                   *
     //!*******************************************************************
@@ -31,6 +34,8 @@ extern "C" int Menu_Main(void)
     InitOSFunctionPointers();
     InitSocketFunctionPointers(); //For logging
 
+    shouldLog = 1;
+
     InitSysFunctionPointers(); // For SYSLaunchMenu()
 
     //For patching
@@ -38,6 +43,7 @@ extern "C" int Menu_Main(void)
     InitPadScoreFunctionPointers();
 
     SetupKernelCallback();
+
 
     log_init("192.168.0.181");
 
@@ -76,7 +82,7 @@ extern "C" int Menu_Main(void)
 */
 void ApplyPatches(){
     PatchInvidualMethodHooks(method_hooks_coreinit,     method_hooks_size_coreinit,     method_calls_coreinit);
-    PatchInvidualMethodHooks(method_hooks_fs,           method_hooks_size_fs,           method_calls_fs);
+    //PatchInvidualMethodHooks(method_hooks_fs,           method_hooks_size_fs,           method_calls_fs);
     PatchInvidualMethodHooks(method_hooks_pad,          method_hooks_size_pad,          method_calls_pad);
 }
 
@@ -86,7 +92,7 @@ void ApplyPatches(){
 
 void RestorePatches(){
     RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
-    RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
+    //RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
     RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
     KernelRestoreInstructions();
 }

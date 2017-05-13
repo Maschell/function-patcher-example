@@ -18,27 +18,19 @@
 #include "pad_function_patcher.h"
 #include "utils/logger.h"
 
+#include "common/retain_vars.h"
+
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
-    log_print("VPADRead\n");
+     if(buffer->btns_r&VPAD_BUTTON_STICK_R) {
+            log_printf("Disable logging\n");
+            shouldLog = 0;
+    }
     return result;
-}
-
-DECL(s32, KPADRead, s32 chan, void * data, u32 size){
-    s32 result = real_KPADRead(chan, data, size);
-    log_print("KPADRead\n");
-    return result;
-}
-
-DECL(void, WPADRead, s32 chan, void * data){
-    real_WPADRead(chan, data);
-    log_print("WPADRead\n");
 }
 
 hooks_magic_t method_hooks_pad[] __attribute__((section(".data"))) = {
     MAKE_MAGIC(VPADRead, LIB_VPAD,          STATIC_FUNCTION),
-    MAKE_MAGIC(KPADRead, LIB_PADSCORE,      DYNAMIC_FUNCTION),
-    MAKE_MAGIC(WPADRead, LIB_PADSCORE,      DYNAMIC_FUNCTION),
 };
 
 u32 method_hooks_size_pad __attribute__((section(".data"))) = sizeof(method_hooks_pad) / sizeof(hooks_magic_t);
