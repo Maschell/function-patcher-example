@@ -66,7 +66,13 @@ void PatchInvidualMethodHooks(hooks_magic_t method_hooks[],int hook_information_
         unsigned int repl_addr = (unsigned int)method_hooks[i].replaceAddr;
         unsigned int call_addr = (unsigned int)method_hooks[i].replaceCall;
 
-        unsigned int real_addr = GetAddressOfFunction(method_hooks[i].functionName,method_hooks[i].library);
+        unsigned int real_addr = method_hooks[i].realAddr;
+        if(real_addr == 0){
+            log_printf("real_addr was NULL, we need to find it.");
+            real_addr = GetAddressOfFunction(method_hooks[i].functionName,method_hooks[i].library);
+        }else{
+            log_printf("real_addr was not NULL! We patch it by the given addr.");
+        }
 
         if(!real_addr){
             log_printf("OSDynLoad_FindExport failed for %s\n", method_hooks[i].functionName);
@@ -313,9 +319,6 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
             return 0;
         }
     }
-
-
-
 
     return real_addr;
 }

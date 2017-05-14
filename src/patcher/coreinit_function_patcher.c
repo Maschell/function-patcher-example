@@ -27,208 +27,63 @@
 
 #include "utils/logger.h"
 
-DECL(void, _Exit, void){
-    log_print("_Exit Application closed \n");
-    shouldLog = 0;
-    real__Exit();
-}
+DECL(u32,nn_nex_RC4Encryption_EncryptDecrypt,void * unkwn1/* probably a nn::nex::Buffer */, void * input_output, u32 length){
+    if(encryptionDirection == 0){
+        log_printf("out:");
+        for(u32 i = 0;i<length;i++){
+            log_printf("%02X",*(char*)(input_output+i));
+        }
+        log_printf("\n");
+    }
 
-DECL(void, __PPCExit, void){
-    log_print("__PPCExit Application closed \n");
-    shouldLog = 0;
-    real___PPCExit();
-}
+    u32 result = real_nn_nex_RC4Encryption_EncryptDecrypt(unkwn1,input_output,length);
 
-DECL(void, COSVReport, uint32_t module, int level, const char *fmt, va_list *va){
-    if(shouldLog == 0)return;
-    char * tmp = NULL;
-    if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
-        log_printf("COSVReport module %d level %d: %s",module,level,tmp);
-	}
-	if(tmp)
-		free(tmp);
-}
+    if(encryptionDirection == 1){
+        log_printf("in :");
+        for(u32 i = 0;i<length;i++){
+            log_printf("%02X",*(char*)(input_output+i));
+        }
+        log_printf("\n");
+    }
 
-
-DECL(void, OSLogPrintf, u32 category, u32 level, u32 options, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSLogPrintf category %d level %d options %d: %s\n",category,level,options,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-DECL(void, COSError, uint32_t module, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
-        log_printf("COSError module %d: %s",module,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
+    return result;
 }
 
 
-DECL(void, COSWarn, uint32_t module, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp)	{
-        log_printf("COSWarn module %d: %s",module,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
+DECL(void *,nn_nex_RC4Encryption_Encrypt,void * a,void * b){
+    encryptionDirection = 0;
+    //Not working... data is slightly off
+    //log_printf("nn_nex_RC4Encryption_Encrypt %08X %08X\n",a,b);
+    /*u32* a_ = (u32*)b;
+    u32* datapointer = a_[4];
+    u32 length = a_[5];
+    log_printf("out:");
+    for(u32 i = 0;i<length;i++){
+        log_printf("%02X",*(char*)(datapointer+i));
+    }
+    log_printf("\n");*/
+    return real_nn_nex_RC4Encryption_Encrypt(a,b); //is calling MARIO_KART_8_HOOK
 }
 
-
-DECL(void, COSInfo, uint32_t module, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("COSInfo module %d: %s",module,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-
-DECL(void, COSVerbose, uint32_t module, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("COSVerbose module %d: %s",module,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-
-DECL(void, OSReport, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSReport: %s",tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-DECL(void, OSReportWarn, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSReportWarn: %s",tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-
-DECL(void, OSReportInfo, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSReportInfo: %s",tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-
-DECL(void, OSReportVerbose, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSReportVerbose: %s",tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-DECL(void, OSPanic, const char *file, int line, const char *fmt, ...){
-    if(shouldLog == 0)return;
-	char * tmp = NULL;
-
-	va_list va;
-	va_start(va, fmt);
-	if((vasprintf(&tmp, fmt, va) >= 0) && tmp){
-        log_printf("OSPanic [%s line: %d]: %s",file,line,tmp);
-	}
-	va_end(va);
-
-	if(tmp)
-		free(tmp);
-}
-
-DECL(void, OSConsoleWrite, const char *msg, uint32_t size){
-    if(shouldLog == 0)return;
-    char cpy[size+1];
-    memcpy(cpy,msg,size);
-    cpy[size] = 0;
-    log_printf("OSConsoleWrite: %s",cpy);
+DECL(void * ,nn_nex_RC4Encryption_Decrypt,void * a,void * b){
+    encryptionDirection = 1;
+    void * res = real_nn_nex_RC4Encryption_Decrypt(a,b); //is calling MARIO_KART_8_HOOK
+    //Not working... data is slightly off
+    /*u32* a_ = (u32*)b;
+    u32* datapointer = a_[4];
+    u32 length = a_[5];
+    log_printf("in :");
+    for(u32 i = 0;i<length;i++){
+        log_printf("%02X",*(char*)(datapointer+i));
+    }
+    log_printf("\n");*/
+    return res;
 }
 
 hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
-    MAKE_MAGIC(COSVReport,                            LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSLogPrintf,                           LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSReport,                              LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(COSError,                              LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(COSWarn,                               LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(COSInfo,                               LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(COSVerbose,                            LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSReportWarn,                          LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSReportInfo,                          LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSReportVerbose,                       LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSPanic,                               LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(OSConsoleWrite,                        LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(__PPCExit,                             LIB_CORE_INIT,  STATIC_FUNCTION),
-    MAKE_MAGIC(_Exit,                                 LIB_CORE_INIT,  STATIC_FUNCTION),
+    MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Encrypt),
+    MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Decrypt),
+    MAKE_MAGIC_REAL(nn_nex_RC4Encryption_EncryptDecrypt),
 };
 
 u32 method_hooks_size_coreinit __attribute__((section(".data"))) = sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t);

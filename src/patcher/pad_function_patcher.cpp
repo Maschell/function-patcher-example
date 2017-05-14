@@ -22,10 +22,7 @@
 
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
-     if(buffer->btns_r&VPAD_BUTTON_STICK_R) {
-            log_printf("Disable logging\n");
-            shouldLog = 0;
-    }
+
     return result;
 }
 

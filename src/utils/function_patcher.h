@@ -63,6 +63,7 @@ int isDynamicFunction(unsigned int physicalAddress);
 
 //Orignal code by Chadderz.
 #define MAKE_MAGIC(x, lib,functionType) { (unsigned int) my_ ## x, (unsigned int) &real_ ## x, lib, # x,0,0,functionType,0}
+#define MAKE_MAGIC_REAL(x) { (unsigned int) my_ ## x, (unsigned int) &real_ ## x, 0, # x,0,0,1,0}
 
 #ifdef __cplusplus
 }
