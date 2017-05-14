@@ -47,30 +47,40 @@ extern "C" int Menu_Main(void)
 
     log_init("192.168.0.181");
 
+    log_printf("logging test\n");
+
     u32 * main_entry_addr = (u32*)*((u32*)OS_SPECIFICS->addr_OSTitle_main_entry);
 
     u32 startAddressInRPX = 0x026774B8;             //Address of MK8 start function in Turbo.rpx v64
     u32 encryptAddressInRPX = 0x0291A44C;           //Address of MK8 nn::nex::RC4Encryption::Encrypt in Turbo.rpx v64
+    u32 encryptAlgoAddressInRPX = 0x02919E04;       //Address of MK8 nn::nex::EncryptionAlgorithm::Encrypt in Turbo.rpx v64 (???)
+    u32 decryptAlgoAddressInRPX = 0x02919EA0;       //Address of MK8 nn::nex::EncryptionAlgorithm::Decrypt in Turbo.rpx v64 (???)
     u32 decryptAddressInRPX = 0x0291A4DC;           //Address of MK8 nn::nex::RC4Encryption::Decrypt in Turbo.rpx v64
     u32 decryptencryptAddressInRPX = 0x0291A2B8;    //Address of MK8 nn::nex::RC4Encryption::EncryptDecrypt in Turbo.rpx v64
+
     u32 * encrypt_ptr  = (u32*)((u32)main_entry_addr + (encryptAddressInRPX-startAddressInRPX));
     u32 * decrypt_ptr  = (u32*)((u32)main_entry_addr + (decryptAddressInRPX-startAddressInRPX));
     u32 * decryptencrypt_ptr  = (u32*)((u32)main_entry_addr + (decryptencryptAddressInRPX-startAddressInRPX));
+    u32 * encryptAlgo_ptr  = (u32*)((u32)main_entry_addr + (encryptAlgoAddressInRPX-startAddressInRPX));
+    u32 * decryptAlgo_ptr  = (u32*)((u32)main_entry_addr + (decryptAlgoAddressInRPX-startAddressInRPX));
 
-    if(*decryptencrypt_ptr == 0x9421FFE0){ //Check if value is as expected => MK8 EUR, v64 //TODO: proper check.
+    if(*decryptencrypt_ptr == 0x9421FFE0 && OSGetTitleID()== 0x000500001010ED00){ //Check if value is as expected => MK8 EUR, v64 //TODO: proper check.
         //for(int i=0;i<10;i++){
         //    log_printf("%08X \n",decryptencrypt_ptr[i]);
         //}
         log_printf("Setting method_hooks_coreinit[0].realAddr to %08X\n",(u32)encrypt_ptr);
         log_printf("Setting method_hooks_coreinit[1].realAddr to %08X\n",(u32)decrypt_ptr);
         log_printf("Setting method_hooks_coreinit[2].realAddr to %08X\n",(u32)decryptencrypt_ptr);
+        log_printf("Setting method_hooks_coreinit[3].realAddr to %08X\n",(u32)encryptAlgo_ptr);
+        log_printf("Setting method_hooks_coreinit[4].realAddr to %08X\n",(u32)decryptAlgo_ptr);
         method_hooks_coreinit[0].realAddr = (u32)encrypt_ptr;
         method_hooks_coreinit[1].realAddr = (u32)decrypt_ptr;
         method_hooks_coreinit[2].realAddr = (u32)decryptencrypt_ptr;
+        method_hooks_coreinit[3].realAddr = (u32)encryptAlgo_ptr;
+        method_hooks_coreinit[4].realAddr = (u32)decryptAlgo_ptr;
         log_print("Patching functions\n");
-        ApplyPatches();
     }
-
+    ApplyPatches();
 
     //Reset everything when were going back to the Mii Maker
     if(!isFirstBoot && isInMiiMakerHBL()){
