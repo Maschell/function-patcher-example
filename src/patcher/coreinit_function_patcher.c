@@ -94,17 +94,15 @@ DECL(void * ,nn_nex_RC4Encryption_Decrypt,void * a,void * b){
     return res;
 }
 
- //Not logging
+/*
 DECL(void * ,nn_nex_EncryptionAlgorithm_Encrypt,void * a,void * b){
     log_printf("nn_nex_EncryptionAlgorithm_Encrypt\n");
     return real_nn_nex_EncryptionAlgorithm_Encrypt(a,b);
 }
-
-//Not logging
 DECL(void * ,nn_nex_EncryptionAlgorithm_Decrypt,void * a,void * b){
     log_printf("nn_nex_EncryptionAlgorithm_Decrypt\n");
     return real_nn_nex_EncryptionAlgorithm_Decrypt(a,b);
-}
+}*/
 
 /* Mario Kart 8 doesn't use this.
 DECL(s32, send, s32 s, const void *buffer, s32 size, s32 flags){
@@ -171,6 +169,7 @@ DECL(s32, sendto, s32 s, const void *buffer, s32 size, s32 flags, const struct s
 }
 
 DECL(s32, NSSLWrite, s32 connection, const void* buf, s32 len,s32 * written){
+    if(!logNSSLWrite) return real_NSSLWrite(connection,buf,len,written);
     char *decrypted_input_data;
     bin_to_strhex((unsigned char *)buf, len, &decrypted_input_data);
 
@@ -192,6 +191,7 @@ DECL(s32, NSSLWrite, s32 connection, const void* buf, s32 len,s32 * written){
 }
 
 DECL(s32, NSSLRead, s32 connection, const void* buf, s32 len,s32 * read){
+    if(!logNSSLRead) return real_NSSLRead(connection,buf,len,read);
     s32 result = real_NSSLRead(connection,buf,len,read);
 
     if(*read > 0){
@@ -216,14 +216,14 @@ hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
     MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Encrypt),
     MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Decrypt),
     MAKE_MAGIC_REAL(nn_nex_RC4Encryption_EncryptDecrypt),
-    MAKE_MAGIC_REAL(nn_nex_EncryptionAlgorithm_Encrypt),
-    MAKE_MAGIC_REAL(nn_nex_EncryptionAlgorithm_Decrypt),
+    //MAKE_MAGIC_REAL(nn_nex_EncryptionAlgorithm_Encrypt),
+    //MAKE_MAGIC_REAL(nn_nex_EncryptionAlgorithm_Decrypt),
     //MAKE_MAGIC(send, LIB_NSYSNET, STATIC_FUNCTION),
     //MAKE_MAGIC(recv, LIB_NSYSNET, STATIC_FUNCTION),
     MAKE_MAGIC(recvfrom, LIB_NSYSNET, STATIC_FUNCTION),
     MAKE_MAGIC(sendto, LIB_NSYSNET, STATIC_FUNCTION),
-    //MAKE_MAGIC(NSSLWrite, LIB_NSYSNET, STATIC_FUNCTION),
-    //MAKE_MAGIC(NSSLRead, LIB_NSYSNET, STATIC_FUNCTION),
+    MAKE_MAGIC(NSSLWrite, LIB_NSYSNET, STATIC_FUNCTION),
+    MAKE_MAGIC(NSSLRead, LIB_NSYSNET, STATIC_FUNCTION),
 };
 
 u32 method_hooks_size_coreinit __attribute__((section(".data"))) = sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t);

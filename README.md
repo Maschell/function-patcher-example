@@ -1,19 +1,19 @@
-# Mario Kart 8 traffic research tool
+# nn::nex traffic research tool
 
 What this tool currently does:  
   
 - log the (encrypted) sendto/recvfrom traffic  
-- hook into the RC4 encryption/decryption function of Mario Kart 8.  
-  
-The hook into the Mario Kart 8 RC4 function, give you some decrypted traffic of the game. Other parts are probably encrypted/decrypted somewhere else.  
+- hook into the RC4 encryption/decryption and log the buffer.  
+
+ The hook into the RC4 function, give you the input/out of the decryption/encrypting used by the game for network payload data.  
+
+Currently the following games are supported:  
+    - Mario Kart 8 (EUR,v64)  
+    - Donkey Kong Tropical Freeze (EUR,v17)  
 
 Caution:  
-I throw this together in a short time, the code is targeted for devs.  
-Many hard coded values, work with the EUR Version of Mario Kart 8 with the newst update installed (v64)  
-Unpolished code for a quick PoC.  
-
-TODO:  
-- Find a way to decrypt the P2P traffic.  
+I threw this together in a short time, the code is targeted for devs.  
+Many hard coded values and a a unpolished code for a quick PoC.  
 
 # Usage
 Replace the IP in the main.cpp with Ip of your Computer and compile it.  
