@@ -48,45 +48,47 @@ void bin_to_strhex(unsigned char *bin, unsigned int binsz, char **result){
     }
 }
 
+#define ENCRYPT 0
+#define DECRYPT 1
 
-DECL(u32,nn_nex_RC4Encryption_EncryptDecrypt,void * unkwn1/* probably a nn::nex::Buffer */, void * input_output, u32 length){
+DECL(u32,nn_nex_RC4Encryption_EncryptDecrypt,void * unkwn1/* probably a nn::nex::Buffer */, void * input_output, u32 length, u32 length2){
     char *in_result;
+
     bin_to_strhex((unsigned char *)input_output, length, &in_result);
     if(in_result != NULL){
-        if(encryptionDirection == 0){
+        if(encryptionDirection == ENCRYPT){
             log_printf("[RC4] decrypted input : %s\n",in_result);
         }else{
-            log_printf("[RC4] encrypted output: %s\n",in_result);
+            log_printf("[RC4] encrypted input: %s\n",in_result);
         }
     }
     free(in_result);
 
-    u32 result = real_nn_nex_RC4Encryption_EncryptDecrypt(unkwn1,input_output,length);
+    u32 result = real_nn_nex_RC4Encryption_EncryptDecrypt(unkwn1,input_output,length,length2);
 
     char *out_result;
     bin_to_strhex((unsigned char *)input_output, length, &out_result);
     if(out_result != NULL){
-        if(encryptionDirection == 1){
+        if(encryptionDirection == DECRYPT){
             log_printf("[RC4] decrypted output: %s\n",out_result);
         }else{
-            log_printf("[RC4] encrytped input : %s\n",out_result);
+            log_printf("[RC4] encrypted output : %s\n",out_result);
         }
     }
     free(out_result);
-
 
     return result;
 }
 
 
 DECL(void *,nn_nex_RC4Encryption_Encrypt,void * a,void * b){
-    encryptionDirection = 0; //Setting the encryption direction and use the EncryptDecrypt Hook
+    encryptionDirection = ENCRYPT; //Setting the encryption direction and use the EncryptDecrypt Hook
     //Data should be ((u32*)b)[4]  length in ((u32*)b)[5] Not working... data is slightly off.
     return real_nn_nex_RC4Encryption_Encrypt(a,b); //is calling nn_nex_RC4Encryption_EncryptDecrypt
 }
 
 DECL(void * ,nn_nex_RC4Encryption_Decrypt,void * a,void * b){
-    encryptionDirection = 1; //Setting the encryption direction and use the EncryptDecrypt Hook
+    encryptionDirection = DECRYPT; //Setting the encryption direction and use the EncryptDecrypt Hook
     void * res = real_nn_nex_RC4Encryption_Decrypt(a,b); //is calling nn_nex_RC4Encryption_EncryptDecrypt
     //Data should be ((u32*)b)[4]  length in ((u32*)b)[5] Not working... data is slightly off.
     return res;
@@ -129,7 +131,6 @@ DECL(s32, recv, s32 s, void *buffer, s32 size, s32 flags){
     return result_size;
 }*/
 
-
 DECL(s32, recvfrom,s32 s, void *buffer, s32 size, s32 flags,struct sockaddr *src_addr, s32 *addrlen){
     s32 result_size = real_recvfrom(s,buffer,size,flags,src_addr,addrlen);
     char *result;
@@ -169,6 +170,48 @@ DECL(s32, sendto, s32 s, const void *buffer, s32 size, s32 flags, const struct s
     return real_sendto(s,buffer,size,flags,dest,dest_len);
 }
 
+DECL(s32, NSSLWrite, s32 connection, const void* buf, s32 len,s32 * written){
+    char *decrypted_input_data;
+    bin_to_strhex((unsigned char *)buf, len, &decrypted_input_data);
+
+    s32 result = real_NSSLWrite(connection,buf,len,written);
+
+    if(*written > 0){
+        if(decrypted_input_data != NULL){
+            log_printf("[NSSLWrite] connection %08X len: %08X written %08X data: %s\n",connection,len,*written,decrypted_input_data);
+        }else{
+            log_printf("[NSSLWrite] connection %08X len: %08X written %08X data: malloc failed\n",connection,len,*written);
+        }
+    }else{
+        log_printf("[NSSLWrite] connection %08X len: %08X written %08X\n",connection,len,*written);
+    }
+
+    free(decrypted_input_data);
+
+    return result;
+}
+
+DECL(s32, NSSLRead, s32 connection, const void* buf, s32 len,s32 * read){
+    s32 result = real_NSSLRead(connection,buf,len,read);
+
+    if(*read > 0){
+        char *decrypted_output_data;
+        bin_to_strhex((unsigned char *)buf, *read, &decrypted_output_data);
+
+        if(decrypted_output_data != NULL ){
+            log_printf("[NSSLRead] connection %08X len: %08X read %08X data: %s\n",connection,len,*read,decrypted_output_data);
+        }else{
+            log_printf("[NSSLRead] connection %08X len: %08X read %08X data: malloc failed\n",connection,len,*read);
+        }
+
+        free(decrypted_output_data);
+    }else{
+        log_printf("[NSSLRead] connection %08X len: %08X read %08X\n",connection,len,*read);
+    }
+
+    return result;
+}
+
 hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
     MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Encrypt),
     MAKE_MAGIC_REAL(nn_nex_RC4Encryption_Decrypt),
@@ -179,6 +222,8 @@ hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
     //MAKE_MAGIC(recv, LIB_NSYSNET, STATIC_FUNCTION),
     MAKE_MAGIC(recvfrom, LIB_NSYSNET, STATIC_FUNCTION),
     MAKE_MAGIC(sendto, LIB_NSYSNET, STATIC_FUNCTION),
+    //MAKE_MAGIC(NSSLWrite, LIB_NSYSNET, STATIC_FUNCTION),
+    //MAKE_MAGIC(NSSLRead, LIB_NSYSNET, STATIC_FUNCTION),
 };
 
 u32 method_hooks_size_coreinit __attribute__((section(".data"))) = sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t);
