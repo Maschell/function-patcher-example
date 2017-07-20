@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
+#ifndef C_RETAINS_VARS_H_
+#define C_RETAINS_VARS_H_
+#include "dynamic_libs/gx2_functions.h"
 
-#ifndef _FS_FUNCTION_PATCHER_H
-#define _FS_FUNCTION_PATCHER_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "utils/function_patcher.h"
-
-extern hooks_magic_t method_hooks_fs[];
-extern u32 method_hooks_size_fs;
-extern volatile unsigned int method_calls_fs[];
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _FS_FUNCTION_PATCHER_H */
+extern u8 gSwap;
+extern u8 gCallbackCooldown;
+#endif // C_RETAINS_VARS_H_

@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,22 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
-
-#ifndef _PAD_FUNCTION_PATCHER_H
-#define _PAD_FUNCTION_PATCHER_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "utils/function_patcher.h"
-
-extern hooks_magic_t method_hooks_pad[];
-extern u32 method_hooks_size_pad;
-extern volatile unsigned int method_calls_pad[];
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* _PAD_FUNCTION_PATCHER_H */
+#include <gctypes.h>
+#include "common/c_retain_vars.h"
+u8 gSwap __attribute__((section(".data"))) = 0;
+u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
