@@ -25,6 +25,10 @@ u8 isFirstBoot __attribute__((section(".data"))) = 1;
 /* Entry point */
 extern "C" int Menu_Main(void)
 {
+    if(gAppStatus == 2){
+        log_printf("No, we don't want to patch stuff again.");
+        return EXIT_RELAUNCH_ON_LOAD;
+    }
     //!*******************************************************************
     //!                   Initialize function pointers                   *
     //!*******************************************************************

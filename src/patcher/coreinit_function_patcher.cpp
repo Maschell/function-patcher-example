@@ -81,7 +81,7 @@ void swapVoices(){
 
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
-    if(!gAppInBackground){
+    if(!gAppStatus){
         if(result > 0 && (buffer[0].btns_h & VPAD_BUTTON_TV) && gCallbackCooldown == 0 ){
             gCallbackCooldown = 0x18;
             gSwap = !gSwap;
@@ -99,11 +99,11 @@ DECL(void, __PPCExit, void){
 
 DECL(u32, ProcUIProcessMessages, u32 u){
     u32 res = real_ProcUIProcessMessages(u);
-    if(res == 2){
-        gAppInBackground = 1;
-    }else if(res == 0){
-        gAppInBackground = 0;
+    if(res != gAppStatus){
+        log_printf("App status changed from %d to %d \n",gAppStatus,res);
+        gAppStatus = res;
     }
+
     return res;
 }
 
