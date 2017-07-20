@@ -16,72 +16,14 @@
  ****************************************************************************/
 #ifndef _VOICE_INFO_H_
 #define _VOICE_INFO_H_
+#include <gctypes.h>
 
-#include "dynamic_libs/ax_functions.h"
-#include "voice_swapper.hpp"
-#include "utils/logger.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-class VoiceInfo{
+#define VOICE_INFO_MAX 100
 
-public:
-
-    VoiceInfo(void * voice){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo] Constructor! Called with %08X\n",voice);}
-        this->v = voice;
-        memset(buffer, 0, sizeof(u32)*24);
-        memset(mixTV, 0, sizeof(u32)*24);
-        memset(mixDRC, 0, sizeof(u32)*24);
-    }
-    ~VoiceInfo(){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo(%08X)] Destructor!\n",v);}
-    }
-
-    void setTVMix(void* mix){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo(%08X)] setTVMix %08X!\n",v,mix);}
-        setMix(0,mix);
-    }
-
-    void setDRCMix(void* mix){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo(%08X)] setDRCMix %08X!\n",v,mix);}
-        setMix(1,mix);
-    }
-
-    void setMix(u32 device, void* mix){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo(%08X)] setMix device: %d mix: %08X!\n",v,device,mix);}
-        if(mix == NULL) return;
-        if(device == 0){
-            memcpy(mixTV,mix,sizeof(u32)*24);
-        }else if(device == 1){
-            memcpy(mixDRC,mix,sizeof(u32)*24);
-        }
-    }
-
-    void swapSounds(){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceInfo(%08X)] swapping sound!!\n",v);}
-        memcpy(buffer,mixTV,sizeof(u32)*24);
-        memcpy(mixTV,mixDRC,sizeof(u32)*24);
-        memcpy(mixDRC,buffer,sizeof(u32)*24);
-    }
-
-    void * getVoice(){
-        return v;
-    }
-
-    u32 * getTVMix(){
-        return mixTV;
-    }
-
-    u32 * getDRCMix(){
-        return mixDRC;
-    }
-
-    void* v = NULL;
-
-    u32 buffer[24];
-    u32 mixTV[24];
-    u32 mixDRC[24];
-};
+typedef struct _VoiceInfo {
+    void* voice;    /**< Pointer to the voice */
+    u32 mixTV[24];  /**< Mix to the TV */
+    u32 mixDRC[24]; /**< Mix of the DRC */
+} VoiceInfo;
 
 #endif //_VOICE_INFO_H_

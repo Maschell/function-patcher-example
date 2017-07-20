@@ -17,7 +17,9 @@
 #ifndef C_RETAINS_VARS_H_
 #define C_RETAINS_VARS_H_
 #include "dynamic_libs/gx2_functions.h"
-
+#include "utils/voice_info.hpp"
 extern u8 gSwap;
 extern u8 gCallbackCooldown;
+extern VoiceInfo gVoiceInfos[VOICE_INFO_MAX];
+
 #endif // C_RETAINS_VARS_H_

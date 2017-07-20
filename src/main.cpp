@@ -44,6 +44,8 @@ extern "C" int Menu_Main(void)
 
     SetupKernelCallback();
 
+    memset(gVoiceInfos,0,sizeof(gVoiceInfos));
+
     //Reset everything when were going back to the Mii Maker
     if(!isFirstBoot && isInMiiMakerHBL()){
         log_print("Returing to the Homebrew Launcher!\n");

@@ -16,5 +16,8 @@
  ****************************************************************************/
 #include <gctypes.h>
 #include "common/c_retain_vars.h"
+
 u8 gSwap __attribute__((section(".data"))) = 0;
 u8 gCallbackCooldown __attribute__((section(".data"))) = 0;
+
+VoiceInfo gVoiceInfos[VOICE_INFO_MAX] __attribute__((section(".data")));

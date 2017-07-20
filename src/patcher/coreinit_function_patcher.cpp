@@ -67,14 +67,14 @@ DECL(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer *colorBuffer, s32 scan
 }
 
 void swapVoices(){
-    std::vector<VoiceInfo*> infos = VoiceSwapper::getAllVoiceInfos();
-    for (std::vector<VoiceInfo*>::iterator it = infos.begin() ; it != infos.end(); ++it){
-        VoiceInfo* cur = *it;
-        cur->swapSounds();
-        real_AXSetVoiceDeviceMix(cur->getVoice(),0,0,cur->getTVMix());
-        real_AXSetVoiceDeviceMix(cur->getVoice(),1,0,cur->getDRCMix());
-        real_AXSetVoiceDeviceMixOld(cur->getVoice(),0,0,cur->getTVMix());
-        real_AXSetVoiceDeviceMixOld(cur->getVoice(),1,0,cur->getDRCMix());
+    VoiceSwapper::swapAll();
+    for(int i = 0;i<VOICE_INFO_MAX;i++){
+        if(gVoiceInfos[i].voice == NULL) continue;
+
+        real_AXSetVoiceDeviceMix(gVoiceInfos[i].voice,0,0,gVoiceInfos[i].mixTV);
+        real_AXSetVoiceDeviceMix(gVoiceInfos[i].voice,1,0,gVoiceInfos[i].mixDRC);
+        real_AXSetVoiceDeviceMixOld(gVoiceInfos[i].voice,0,0,gVoiceInfos[i].mixTV);
+        real_AXSetVoiceDeviceMixOld(gVoiceInfos[i].voice,1,0,gVoiceInfos[i].mixDRC);
     }
 }
 
@@ -92,7 +92,6 @@ DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
 }
 
 DECL(void, __PPCExit, void){
-    VoiceSwapper::destroyInstance();
     real___PPCExit();
 }
 

@@ -16,92 +16,63 @@
  ****************************************************************************/
 #ifndef _VOICE_SWAPPER_H_
 #define _VOICE_SWAPPER_H_
-#define VOICE_SWAP_LOG 2
+#define VOICE_SWAP_LOG 0
 #include "voice_info.hpp"
-#include "utils/logger.h"
 #include "common/c_retain_vars.h"
+
+#include "utils/logger.h"
+
 #include "dynamic_libs/os_functions.h"
-#include <map>
-#include <vector>
+#include <stdio.h>
+#include <string.h>
 
 class VoiceSwapper{
 
 public:
-     static VoiceSwapper * getInstance() {
-        if(!instance)
-            instance = new VoiceSwapper();
-        return instance;
-    }
-
-    static void destroyInstance() {
-        if(instance){
-            delete instance;
-            instance = NULL;
-        }
-    }
-
     static void acquireVoice(void * voice){
-        VoiceSwapper * instance = VoiceSwapper::getInstance();
-        if(instance != NULL){
-            instance->_acquireVoice(voice);
-        }
-    }
-
-    static void freeVoice(void * voice){
-        VoiceSwapper * instance = VoiceSwapper::getInstance();
-        if(instance != NULL){
-            instance->_freeVoice(voice);
-        }
-    }
-
-    static void setMix(void * voice,u32 device, void* mix){
-        VoiceSwapper * instance = VoiceSwapper::getInstance();
-        if(instance != NULL){
-            instance->_setMix(voice,device,mix);
-        }
-    }
-
-    static void swapAll(){
-        VoiceSwapper * instance = VoiceSwapper::getInstance();
-        if(instance != NULL){
-            instance->swapAll();
-        }
-    }
-
-    static std::vector<VoiceInfo*> getAllVoiceInfos(){
-        VoiceSwapper * instance = VoiceSwapper::getInstance();
-        if(instance != NULL){
-            return instance->_getAllVoiceInfos();
-        }
-        std::vector<VoiceInfo*> emptyList;
-        return emptyList;
-    }
-
-
-private:
-    VoiceSwapper(){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] Creating the VoiceSwapper Instance!\n");}
-    }
-    ~VoiceSwapper(){
-        if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] Deleting the VoiceSwapper Instance!\n");}
-        for (std::map<void*,VoiceInfo*>::iterator it=voices.begin(); it!=voices.end(); ++it){
-            VoiceInfo* info = it->second;
-            if(info != NULL){
-                if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] Deleting voice %08X (%08X)!\n",it->first,it->second);}
-                free(info);
+        for(int i = 0;i<VOICE_INFO_MAX;i++){
+            if(gVoiceInfos[i].voice == NULL){
+                if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] acquireVoice in slot %d for %08X!\n",i,voice);}
+                gVoiceInfos[i].voice = voice;
+                break;
             }
         }
     }
 
-    void _acquireVoice(void * voice);
-    void _freeVoice(void * voice);
-    void _setMix(void * voice,u32 device, void* mix);
-    void _swapAll();
-    std::vector<VoiceInfo*> _getAllVoiceInfos();
+    static void freeVoice(void * voice){
+        for(int i = 0;i<VOICE_INFO_MAX;i++){
+            if(gVoiceInfos[i].voice == voice){
+                if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] freeVoice in slot %d for %08X!\n",i,voice);}
+                gVoiceInfos[i].voice = NULL;
+                break;
+            }
+        }
+    }
 
-    static VoiceSwapper * instance __attribute__((section(".data")));
-    std::map<void*,VoiceInfo*> voices;
+    static void setMix(void * voice,u32 device, void* mix){
+       for(int i = 0;i<VOICE_INFO_MAX;i++){
+            if(gVoiceInfos[i].voice == voice){
+                if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] setMix in slot %d for %08X!\n",i,voice);}
+                if(device == 0){
+                    memcpy(gVoiceInfos[i].mixTV,mix,sizeof(gVoiceInfos[i].mixTV));
+                }else if(device == 1){
+                    memcpy(gVoiceInfos[i].mixDRC,mix,sizeof(gVoiceInfos[i].mixDRC));
+                }
+                break;
+            }
+        }
+    }
 
+    static void swapAll(){
+        for(int i = 0;i<VOICE_INFO_MAX;i++){
+            if(gVoiceInfos[i].voice == NULL) continue;
+            if(VOICE_SWAP_LOG == 1){log_printf("[VoiceSwapper] swapping slot %d, voice %08X!\n",i,gVoiceInfos[i].voice);}
+            u32 buffer[24];
+            memcpy(buffer,gVoiceInfos[i].mixTV,sizeof(gVoiceInfos[i].mixTV));
+            memcpy(gVoiceInfos[i].mixTV,gVoiceInfos[i].mixDRC,sizeof(gVoiceInfos[i].mixTV));
+            memcpy(gVoiceInfos[i].mixDRC,buffer,sizeof(gVoiceInfos[i].mixTV));
+        }
+    }
 };
 
 #endif //_VOICE_SWAPPER_H_
