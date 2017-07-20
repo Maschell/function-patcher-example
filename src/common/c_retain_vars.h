@@ -20,6 +20,7 @@
 #include "utils/voice_info.hpp"
 extern u8 gSwap;
 extern u8 gCallbackCooldown;
+extern u8 gAppInBackground;
 extern VoiceInfo gVoiceInfos[VOICE_INFO_MAX];
 
 #endif // C_RETAINS_VARS_H_

@@ -12,6 +12,7 @@
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/socket_functions.h"
 #include "dynamic_libs/sys_functions.h"
+#include "dynamic_libs/proc_ui_functions.h"
 #include "patcher/coreinit_function_patcher.h"
 #include "utils/function_patcher.h"
 #include "kernel/kernel_functions.h"
@@ -35,6 +36,7 @@ extern "C" int Menu_Main(void)
     log_init("192.168.0.181");
 
     InitSysFunctionPointers(); // For SYSLaunchMenu()
+    InitProcUIFunctionPointers();
 
     //For patching
     InitVPadFunctionPointers();

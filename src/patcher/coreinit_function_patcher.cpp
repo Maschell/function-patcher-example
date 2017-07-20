@@ -20,6 +20,7 @@
 #include "utils/voice_swapper.hpp"
 #include "common/c_retain_vars.h"
 #include "system/memory.h"
+#include "dynamic_libs/proc_ui_functions.h"
 
 DECL(s32, AXSetVoiceDeviceMixOld, void *v, s32 device, u32 id, void *mix){
     if(gSwap) (device == 1) ? device = 0: device = 1;
@@ -80,13 +81,14 @@ void swapVoices(){
 
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
-
-    if(result > 0 && (buffer[0].btns_h & VPAD_BUTTON_TV) && gCallbackCooldown == 0){
-        gCallbackCooldown = 0x10;
-        gSwap = !gSwap;
-        swapVoices();
+    if(!gAppInBackground){
+        if(result > 0 && (buffer[0].btns_h & VPAD_BUTTON_TV) && gCallbackCooldown == 0 ){
+            gCallbackCooldown = 0x18;
+            gSwap = !gSwap;
+            swapVoices();
+        }
+        if(gCallbackCooldown > 0) gCallbackCooldown--;
     }
-    if(gCallbackCooldown > 0) gCallbackCooldown--;
 
     return result;
 }
@@ -95,7 +97,18 @@ DECL(void, __PPCExit, void){
     real___PPCExit();
 }
 
+DECL(u32, ProcUIProcessMessages, u32 u){
+    u32 res = real_ProcUIProcessMessages(u);
+    if(res == 2){
+        gAppInBackground = 1;
+    }else if(res == 0){
+        gAppInBackground = 0;
+    }
+    return res;
+}
+
 hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
+    MAKE_MAGIC(     ProcUIProcessMessages,                          LIB_PROC_UI,    STATIC_FUNCTION),
     MAKE_MAGIC(     __PPCExit,                                      LIB_CORE_INIT,  STATIC_FUNCTION),
     MAKE_MAGIC(     GX2CopyColorBufferToScanBuffer,                 LIB_GX2,        STATIC_FUNCTION),
     MAKE_MAGIC(     VPADRead,                                       LIB_VPAD,       STATIC_FUNCTION),
