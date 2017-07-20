@@ -294,6 +294,11 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
         if(vpadbase_handle == 0){log_print("LIB_VPADBASE not acquired\n"); return 0;}
         rpl_handle = vpadbase_handle;
     }
+    else if(library == LIB_PROC_UI){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_PROC_UI\n", functionName);}
+        if(proc_ui_handle == 0){log_print("LIB_PROC_UI not acquired\n"); return 0;}
+        rpl_handle = proc_ui_handle;
+    }
 
     if(!rpl_handle){
         log_printf("Failed to find the RPL handle for %s\n", functionName);

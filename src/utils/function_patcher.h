@@ -37,6 +37,7 @@ extern "C" {
 #include "dynamic_libs/vpad_functions.h"
 #include "dynamic_libs/acp_functions.h"
 #include "dynamic_libs/syshid_functions.h"
+#include "dynamic_libs/proc_ui_functions.h"
 
 //Orignal code by Chadderz.
 #define DECL(res, name, ...) \
