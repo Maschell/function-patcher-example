@@ -21,6 +21,7 @@
 extern u8 gSwap;
 extern u8 gCallbackCooldown;
 extern u8 gAppStatus;
+extern u32 gButtonCombo;
 extern VoiceInfo gVoiceInfos[VOICE_INFO_MAX];
 
 #endif // C_RETAINS_VARS_H_

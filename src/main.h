@@ -14,7 +14,7 @@ int Menu_Main(void);
 void deInit(void);
 void ApplyPatches(void);
 void RestorePatches();
-
+u32 SplashScreen(s32 time,s32 combotime);
 s32 isInMiiMakerHBL();
 
 #ifdef __cplusplus

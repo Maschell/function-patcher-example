@@ -67,6 +67,13 @@ DECL(void, GX2CopyColorBufferToScanBuffer, GX2ColorBuffer *colorBuffer, s32 scan
     real_GX2CopyColorBufferToScanBuffer(colorBuffer,scan_target);
 }
 
+/*
+DECL(s32, AXSetDefaultMixerSelectOld, u32 s){
+    s32 result = real_AXSetDefaultMixerSelectOld(s);
+    return result;
+}*/
+
+
 void swapVoices(){
     VoiceSwapper::swapAll();
     for(int i = 0;i<VOICE_INFO_MAX;i++){
@@ -81,14 +88,15 @@ void swapVoices(){
 
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
-    if(!gAppStatus){
-        if(result > 0 && (buffer[0].btns_h & VPAD_BUTTON_TV) && gCallbackCooldown == 0 ){
-            gCallbackCooldown = 0x18;
-            gSwap = !gSwap;
+
+    if(result > 0 && ((buffer[0].btns_h & gButtonCombo) == gButtonCombo) && gCallbackCooldown == 0 ){
+        gCallbackCooldown = 0x3C;
+        gSwap = !gSwap;
+        if(!gAppStatus){
             swapVoices();
         }
-        if(gCallbackCooldown > 0) gCallbackCooldown--;
     }
+    if(gCallbackCooldown > 0) gCallbackCooldown--;
 
     return result;
 }
@@ -115,6 +123,7 @@ hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
     MAKE_MAGIC_NAME(AXAcquireVoiceExOld,    AXAcquireVoiceEx,       LIB_AX_OLD,     STATIC_FUNCTION),
     MAKE_MAGIC_NAME(AXFreeVoiceOld,         AXFreeVoice,            LIB_AX_OLD,     STATIC_FUNCTION),
     MAKE_MAGIC_NAME(AXSetVoiceDeviceMixOld, AXSetVoiceDeviceMix,    LIB_AX_OLD,     STATIC_FUNCTION),
+    //MAKE_MAGIC_NAME(AXSetDefaultMixerSelectOld, AXSetDefaultMixerSelect,    LIB_AX_OLD,     STATIC_FUNCTION),
     MAKE_MAGIC_NAME(AXAcquireVoiceEx,       AXAcquireVoiceEx,       LIB_AX,         DYNAMIC_FUNCTION),
     MAKE_MAGIC_NAME(AXFreeVoice,            AXFreeVoice,            LIB_AX,         DYNAMIC_FUNCTION),
     MAKE_MAGIC_NAME(AXSetVoiceDeviceMix,    AXSetVoiceDeviceMix,    LIB_AX,         DYNAMIC_FUNCTION),
