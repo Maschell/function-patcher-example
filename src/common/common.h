@@ -28,6 +28,10 @@ extern "C" {
 #define LIB_VPADBASE            13
 #define LIB_AX_OLD              14
 #define LIB_PROC_UI             15
+#define LIB_NTAG                16
+#define LIB_NFP                 17
+#define LIB_SAVE                18
+#define LIB_ACT                 19
 
 // functions types
 #define STATIC_FUNCTION         0

@@ -4,25 +4,34 @@
 #include <malloc.h>
 #include "main.h"
 #include "common/common.h"
+#include "common/c_retain_vars.h"
 
 #include "dynamic_libs/os_functions.h"
 #include "dynamic_libs/gx2_functions.h"
 #include "dynamic_libs/syshid_functions.h"
 #include "dynamic_libs/vpad_functions.h"
+#include "dynamic_libs/nn_act_functions.h"
+#include "dynamic_libs/nn_save_functions.h"
 #include "dynamic_libs/socket_functions.h"
 #include "dynamic_libs/sys_functions.h"
 #include "patcher/coreinit_function_patcher.h"
 #include "patcher/fs_function_patcher.h"
-#include "patcher/pad_function_patcher.h"
+#include "patcher/save_function_patcher.h"
+#include "patcher/proc_ui_function_patcher.h"
 #include "utils/function_patcher.h"
 #include "kernel/kernel_functions.h"
 #include "utils/logger.h"
+#include "diibugger/server.h"
 
 u8 isFirstBoot __attribute__((section(".data"))) = 1;
 
 /* Entry point */
 extern "C" int Menu_Main(void)
 {
+    if(gAppStatus == 2){
+        return EXIT_RELAUNCH_ON_LOAD;
+    }
+    gAppStatus = 0;
     //!*******************************************************************
     //!                   Initialize function pointers                   *
     //!*******************************************************************
@@ -32,6 +41,10 @@ extern "C" int Menu_Main(void)
     InitSocketFunctionPointers(); //For logging
 
     InitSysFunctionPointers(); // For SYSLaunchMenu()
+    InitSaveFunctionPointers();
+    InitACTFunctionPointers();
+    InitFSFunctionPointers();
+    InitProcUIFunctionPointers();
 
     //For patching
     InitVPadFunctionPointers();
@@ -49,12 +62,16 @@ extern "C" int Menu_Main(void)
         return EXIT_SUCCESS;
     }
 
+    if(!isFirstBoot){
+        log_print("Patching functions\n");
+        ApplyPatches();
+        InitDiibugger();
+    }
 
     //!*******************************************************************
     //!                        Patching functions                        *
     //!*******************************************************************
-    log_print("Patching functions\n");
-    ApplyPatches();
+
 
 
     if(!isInMiiMakerHBL()){ //Starting the application
@@ -77,7 +94,8 @@ extern "C" int Menu_Main(void)
 void ApplyPatches(){
     PatchInvidualMethodHooks(method_hooks_coreinit,     method_hooks_size_coreinit,     method_calls_coreinit);
     PatchInvidualMethodHooks(method_hooks_fs,           method_hooks_size_fs,           method_calls_fs);
-    PatchInvidualMethodHooks(method_hooks_pad,          method_hooks_size_pad,          method_calls_pad);
+    PatchInvidualMethodHooks(method_hooks_save,         method_hooks_size_save,         method_calls_save);
+    PatchInvidualMethodHooks(method_hooks_proc_ui,      method_hooks_size_proc_ui,      method_calls_proc_ui);
 }
 
 /*
@@ -87,7 +105,8 @@ void ApplyPatches(){
 void RestorePatches(){
     RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
     RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
-    RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
+    RestoreInvidualInstructions(method_hooks_save,      method_hooks_size_save);
+    RestoreInvidualInstructions(method_hooks_proc_ui,   method_hooks_size_proc_ui);
     KernelRestoreInstructions();
 }
 

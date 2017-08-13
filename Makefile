@@ -35,6 +35,7 @@ SOURCES		:=	src \
 				src/dynamic_libs \
 				src/kernel \
 				src/patcher \
+				src/diibugger \
 				src/common \
 				src/system \
 				src/utils \

@@ -299,6 +299,26 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
         if(proc_ui_handle == 0){log_print("LIB_PROC_UI not acquired\n"); return 0;}
         rpl_handle = proc_ui_handle;
     }
+    else if(library == LIB_NTAG){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_NTAG\n", functionName);}
+        if(ntag_handle == 0){log_print("LIB_NTAG not acquired\n"); return 0;}
+        rpl_handle = proc_ui_handle;
+    }
+    else if(library == LIB_NFP){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_NFP\n", functionName);}
+        if(nfp_handle == 0){log_print("LIB_NFP not acquired\n"); return 0;}
+        rpl_handle = nfp_handle;
+    }
+    else if(library == LIB_SAVE){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_SAVE\n", functionName);}
+        if(nn_save_handle == 0){log_print("LIB_SAVE not acquired\n"); return 0;}
+        rpl_handle = nn_save_handle;
+    }
+    else if(library == LIB_ACT){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_ACT\n", functionName);}
+        if(nn_act_handle == 0){log_print("LIB_ACT not acquired\n"); return 0;}
+        rpl_handle = nn_act_handle;
+    }
 
     if(!rpl_handle){
         log_printf("Failed to find the RPL handle for %s\n", functionName);

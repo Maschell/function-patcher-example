@@ -1,31 +1,28 @@
-/****************************************************************************
- * Copyright (C) 2016 Maschell
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ****************************************************************************/
-
 #include "coreinit_function_patcher.h"
 
 #include "utils/logger.h"
+#include "common/c_retain_vars.h"
 
 DECL(void, _Exit, void){
-    log_print("Application closed \n");
+    log_print("Application closed.\n");
+
+    if(diiServer_threadPointer != 0){
+        log_printf("Killing the RPC thread \n");
+        diiServer_threadPointer->shutdownThread();
+        log_printf("Killing the RPC thread done.\n");
+        diiServer_threadPointer = 0;
+    }
+
     real__Exit();
 }
 
+DECL(u32, OSIsDebuggerInitialized, void){
+    return 1;
+}
+
 hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
-    MAKE_MAGIC(_Exit,                               LIB_CORE_INIT,  STATIC_FUNCTION),
+    MAKE_MAGIC(_Exit,                           LIB_CORE_INIT,  STATIC_FUNCTION),
+    MAKE_MAGIC(OSIsDebuggerInitialized,         LIB_CORE_INIT,  STATIC_FUNCTION),
 };
 
 u32 method_hooks_size_coreinit __attribute__((section(".data"))) = sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t);
