@@ -85,9 +85,10 @@ void ApplyPatches(){
 */
 
 void RestorePatches(){
-    RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
-    RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
     RestoreInvidualInstructions(method_hooks_pad,       method_hooks_size_pad);
+    RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
+    RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
+
     KernelRestoreInstructions();
 }
 
