@@ -74,7 +74,7 @@ void PatchInvidualMethodHooks(hooks_magic_t method_hooks[],int hook_information_
             continue;
         }
 
-        if(DEBUG_LOG_DYN)log_printf("%s is located at %08X!\n", method_hooks[i].functionName,real_addr);
+        if(DEBUG_LOG_DYN){log_printf("%s is located at %08X!\n", method_hooks[i].functionName,real_addr);}
 
         physical = (u32)OSEffectiveToPhysical((void*)real_addr);
         if(!physical){
@@ -83,7 +83,7 @@ void PatchInvidualMethodHooks(hooks_magic_t method_hooks[],int hook_information_
              continue;
         }
 
-        if(DEBUG_LOG_DYN)log_printf("%s physical is located at %08X!\n", method_hooks[i].functionName,physical);
+        if(DEBUG_LOG_DYN){log_printf("%s physical is located at %08X!\n", method_hooks[i].functionName,physical);}
 
         *(volatile unsigned int *)(call_addr) = (unsigned int)(space) - CODE_RW_BASE_OFFSET;
 
@@ -96,8 +96,8 @@ void PatchInvidualMethodHooks(hooks_magic_t method_hooks[],int hook_information_
             // fill the restore instruction section
             method_hooks[i].realAddr = real_addr;
             method_hooks[i].restoreInstruction = *(space-1);
-             if(DEBUG_LOG_DYN)log_printf("method_hooks[i].realAddr = %08X!\n", method_hooks[i].realAddr);
-             if(DEBUG_LOG_DYN)log_printf("method_hooks[i].restoreInstruction = %08X!\n",method_hooks[i].restoreInstruction) ;
+             if(DEBUG_LOG_DYN){log_printf("method_hooks[i].realAddr = %08X!\n", method_hooks[i].realAddr);}
+             if(DEBUG_LOG_DYN){log_printf("method_hooks[i].restoreInstruction = %08X!\n",method_hooks[i].restoreInstruction) ;}
         }
         else{
             log_printf("Error. Can't save %s for restoring!\n", method_hooks[i].functionName);
@@ -175,9 +175,9 @@ void RestoreInvidualInstructions(hooks_magic_t method_hooks[],int hook_informati
         else
         {
             physical = (u32)OSEffectiveToPhysical((void*)method_hooks[i].realAddr); //When its an static function, we need to use the old location
-            if(DEBUG_LOG_DYN)log_printf("Restoring %08X to %08X\n",(u32)method_hooks[i].restoreInstruction,physical);
+            if(DEBUG_LOG_DYN){log_printf("Restoring %08X to %08X\n",(u32)method_hooks[i].restoreInstruction,physical);}
             SC0x25_KernelCopyData(physical,(u32)&method_hooks[i].restoreInstruction , 4);
-            if(DEBUG_LOG_DYN)log_printf("ICInvalidateRange %08X\n",(void*)method_hooks[i].realAddr);
+            if(DEBUG_LOG_DYN){log_printf("ICInvalidateRange %08X\n",(void*)method_hooks[i].realAddr);}
             ICInvalidateRange((void*)method_hooks[i].realAddr, 4);
             log_printf("done\n");
         }
@@ -220,77 +220,77 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
 
     unsigned int rpl_handle = 0;
     if(library == LIB_CORE_INIT){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_CORE_INIT\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_CORE_INIT\n", functionName);}
         if(coreinit_handle == 0){log_print("LIB_CORE_INIT not acquired\n"); return 0;}
         rpl_handle = coreinit_handle;
     }
     else if(library == LIB_NSYSNET){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_NSYSNET\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_NSYSNET\n", functionName);}
         if(nsysnet_handle == 0){log_print("LIB_NSYSNET not acquired\n"); return 0;}
         rpl_handle = nsysnet_handle;
     }
     else if(library == LIB_GX2){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_GX2\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_GX2\n", functionName);}
         if(gx2_handle == 0){log_print("LIB_GX2 not acquired\n"); return 0;}
         rpl_handle = gx2_handle;
     }
     else if(library == LIB_AOC){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_AOC\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_AOC\n", functionName);}
         if(aoc_handle == 0){log_print("LIB_AOC not acquired\n"); return 0;}
         rpl_handle = aoc_handle;
     }
     else if(library == LIB_AX){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_AX\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_AX\n", functionName);}
         if(sound_handle == 0){log_print("LIB_AX not acquired\n"); return 0;}
         rpl_handle = sound_handle;
     }
     else if(library == LIB_AX_OLD){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_AX_OLD\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_AX_OLD\n", functionName);}
         if(sound_handle_old == 0){log_print("LIB_AX_OLD not acquired\n"); return 0;}
         rpl_handle = sound_handle_old;
     }
     else if(library == LIB_FS){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_FS\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_FS\n", functionName);}
         if(coreinit_handle == 0){log_print("LIB_FS not acquired\n"); return 0;}
         rpl_handle = coreinit_handle;
     }
     else if(library == LIB_OS){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_OS\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_OS\n", functionName);}
         if(coreinit_handle == 0){log_print("LIB_OS not acquired\n"); return 0;}
         rpl_handle = coreinit_handle;
     }
     else if(library == LIB_PADSCORE){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_PADSCORE\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_PADSCORE\n", functionName);}
         if(padscore_handle == 0){log_print("LIB_PADSCORE not acquired\n"); return 0;}
         rpl_handle = padscore_handle;
     }
     else if(library == LIB_SOCKET){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_SOCKET\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_SOCKET\n", functionName);}
         if(nsysnet_handle == 0){log_print("LIB_SOCKET not acquired\n"); return 0;}
         rpl_handle = nsysnet_handle;
     }
     else if(library == LIB_SYS){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_SYS\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_SYS\n", functionName);}
         if(sysapp_handle == 0){log_print("LIB_SYS not acquired\n"); return 0;}
         rpl_handle = sysapp_handle;
     }
     else if(library == LIB_VPAD){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_VPAD\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_VPAD\n", functionName);}
         if(vpad_handle == 0){log_print("LIB_VPAD not acquired\n"); return 0;}
         rpl_handle = vpad_handle;
     }
     else if(library == LIB_NN_ACP){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_NN_ACP\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_NN_ACP\n", functionName);}
         if(acp_handle == 0){log_print("LIB_NN_ACP not acquired\n"); return 0;}
         rpl_handle = acp_handle;
     }
     else if(library == LIB_SYSHID){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_SYSHID\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_SYSHID\n", functionName);}
         if(syshid_handle == 0){log_print("LIB_SYSHID not acquired\n"); return 0;}
         rpl_handle = syshid_handle;
     }
     else if(library == LIB_VPADBASE){
-        if(DEBUG_LOG_DYN)log_printf("FindExport of %s! From LIB_VPADBASE\n", functionName);
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_VPADBASE\n", functionName);}
         if(vpadbase_handle == 0){log_print("LIB_VPADBASE not acquired\n"); return 0;}
         rpl_handle = vpadbase_handle;
     }
@@ -319,7 +319,11 @@ unsigned int GetAddressOfFunction(const char * functionName,unsigned int library
         if(nn_act_handle == 0){log_print("LIB_ACT not acquired\n"); return 0;}
         rpl_handle = nn_act_handle;
     }
-
+    else if(library == LIB_NIM){
+        if(DEBUG_LOG_DYN){log_printf("FindExport of %s! From LIB_NIM\n", functionName);}
+        if(nn_nim_handle == 0){log_print("LIB_NIM not acquired\n"); return 0;}
+        rpl_handle = nn_nim_handle;
+    }
 
     if(!rpl_handle){
         log_printf("Failed to find the RPL handle for %s\n", functionName);

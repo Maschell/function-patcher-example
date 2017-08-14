@@ -32,6 +32,7 @@ extern "C" {
 #define LIB_NFP                 17
 #define LIB_SAVE                18
 #define LIB_ACT                 19
+#define LIB_NIM                 20
 
 // functions types
 #define STATIC_FUNCTION         0
