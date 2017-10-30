@@ -2,21 +2,23 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
+
+#include <utils/function_patcher.h>
+#include <kernel/kernel_functions.h>
+#include <utils/logger.h>
+#include <dynamic_libs/os_functions.h>
+#include <dynamic_libs/gx2_functions.h>
+#include <dynamic_libs/syshid_functions.h>
+#include <dynamic_libs/vpad_functions.h>
+#include <dynamic_libs/socket_functions.h>
+#include <dynamic_libs/sys_functions.h>
+
 #include "main.h"
 #include "common/common.h"
-
-#include "dynamic_libs/os_functions.h"
-#include "dynamic_libs/gx2_functions.h"
-#include "dynamic_libs/syshid_functions.h"
-#include "dynamic_libs/vpad_functions.h"
-#include "dynamic_libs/socket_functions.h"
-#include "dynamic_libs/sys_functions.h"
 #include "patcher/coreinit_function_patcher.h"
 #include "patcher/fs_function_patcher.h"
 #include "patcher/pad_function_patcher.h"
-#include "utils/function_patcher.h"
-#include "kernel/kernel_functions.h"
-#include "utils/logger.h"
+
 
 u8 isFirstBoot __attribute__((section(".data"))) = 1;
 
@@ -29,17 +31,13 @@ extern "C" int Menu_Main(void)
     //! aquire every rpl we want to patch
 
     InitOSFunctionPointers();
-    InitSocketFunctionPointers(); //For logging
-
     InitSysFunctionPointers(); // For SYSLaunchMenu()
-
-    //For patching
-    InitVPadFunctionPointers();
-    InitPadScoreFunctionPointers();
 
     SetupKernelCallback();
 
-    log_init("192.168.0.181");
+    log_init();
+
+    log_print("Function patcher example\n");
 
     //Reset everything when were going back to the Mii Maker
     if(!isFirstBoot && isInMiiMakerHBL()){
@@ -49,13 +47,11 @@ extern "C" int Menu_Main(void)
         return EXIT_SUCCESS;
     }
 
-
     //!*******************************************************************
     //!                        Patching functions                        *
     //!*******************************************************************
     log_print("Patching functions\n");
     ApplyPatches();
-
 
     if(!isInMiiMakerHBL()){ //Starting the application
         return EXIT_RELAUNCH_ON_LOAD;
@@ -89,12 +85,12 @@ void RestorePatches(){
     RestoreInvidualInstructions(method_hooks_fs,        method_hooks_size_fs);
     RestoreInvidualInstructions(method_hooks_coreinit,  method_hooks_size_coreinit);
 
-    KernelRestoreInstructions();
+    //KernelRestoreInstructions();
 }
 
 void deInit(){
     RestorePatches();
-    log_deinit();
+    //log_deinit();
 }
 
 s32 isInMiiMakerHBL(){

@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
-#include "coreinit_function_patcher.h"
+#include <utils/logger.h>
 
-#include "utils/logger.h"
+#include "coreinit_function_patcher.h"
 
 DECL(void, _Exit, void){
     log_print("Application closed \n");
@@ -31,5 +31,5 @@ hooks_magic_t method_hooks_coreinit[] __attribute__((section(".data"))) = {
 u32 method_hooks_size_coreinit __attribute__((section(".data"))) = sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t);
 
 //! buffer to store our instructions needed for our replacements
-volatile unsigned int method_calls_coreinit[sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t) * FUNCTION_PATCHER_METHOD_STORE_SIZE] __attribute__((section(".data")));
+volatile u32 method_calls_coreinit[sizeof(method_hooks_coreinit) / sizeof(hooks_magic_t) * FUNCTION_PATCHER_METHOD_STORE_SIZE] __attribute__((section(".data")));
 

@@ -26,7 +26,7 @@ extern "C" {
 
 extern hooks_magic_t method_hooks_pad[];
 extern u32 method_hooks_size_pad;
-extern volatile unsigned int method_calls_pad[];
+extern volatile u32 method_calls_pad[];
 
 #ifdef __cplusplus
 }

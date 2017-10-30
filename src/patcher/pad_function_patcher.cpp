@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (C) 2016 Maschell
+ * Copyright (C) 2016,2017 Maschell
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ****************************************************************************/
 
+#include <utils/logger.h>
 #include "pad_function_patcher.h"
-#include "utils/logger.h"
 
 DECL(int, VPADRead, int chan, VPADData *buffer, u32 buffer_size, s32 *error) {
     int result = real_VPADRead(chan, buffer, buffer_size, error);
@@ -44,5 +44,5 @@ hooks_magic_t method_hooks_pad[] __attribute__((section(".data"))) = {
 u32 method_hooks_size_pad __attribute__((section(".data"))) = sizeof(method_hooks_pad) / sizeof(hooks_magic_t);
 
 //! buffer to store our instructions needed for our replacements
-volatile unsigned int method_calls_pad[sizeof(method_hooks_pad) / sizeof(hooks_magic_t) * FUNCTION_PATCHER_METHOD_STORE_SIZE] __attribute__((section(".data")));
+volatile u32 method_calls_pad[sizeof(method_hooks_pad) / sizeof(hooks_magic_t) * FUNCTION_PATCHER_METHOD_STORE_SIZE] __attribute__((section(".data")));
 
